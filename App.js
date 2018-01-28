@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
-import { keyboardStyle, suggestionsStyle } from './styles';
+import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
 
 let inwokacja = 'Litwo! Ojczyzno moja! Ty jesteś jak zdrowie, Ile cię trzeba cenić, ten tylko się dowie, Kto cię stracił. Dziś piękność twą w całej ozdobie Widzę i opisuję, bo tęsknię po tobie Panno święta, co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie! Ty, co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem! Jak mnie dziecko do zdrowia powróciłaś cudem, (Gdy od płaczącej matki pod Twoją opiekę Ofiarowany, martwą podniosłem powiekę';
 inwokacja = inwokacja.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
@@ -184,10 +184,10 @@ export default class App extends React.Component {
         );
 
         return (
-            <View style={styles.container}>
-              <View style={styles.preview}>
+            <View style={viewStyle.container}>
+              <View style={viewStyle.preview}>
                 <TextInput
-                    style={styles.inputField}
+                    style={viewStyle.inputField}
                     value={this.state.text}
                     onChangeText={(text) => this.setState(text)}
                     onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start}) }}
@@ -258,21 +258,3 @@ export default class App extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
-    preview: {
-        flex: 0.63,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    inputField: {
-        flex: 0.9,
-        height: 300,
-        fontSize: 20,
-    },
-});

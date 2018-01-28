@@ -17,7 +17,7 @@ export const suggestionsStyle = StyleSheet.create({
     },
     suggButtonLabel: {
         color: '#555',
-    }
+    },
 });
 
 export default suggestionsStyle;
