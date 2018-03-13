@@ -6,6 +6,9 @@ export const keyboardStyle = StyleSheet.create({
         backgroundColor: 'gray',
         justifyContent: 'space-between',
     },
+    keyboardWrapper: {
+        flex: 1,
+    },
     keyboardRow: {
         flex: 1,
         flexDirection: 'row',

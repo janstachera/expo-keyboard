@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "my-expo-keyboard",
+    "name": "expo-keyboard",
     "description": "This project is really great.",
-    "slug": "my-expo-keyboard",
+    "slug": "expo-keyboard",
     "privacy": "public",
     "sdkVersion": "25.0.0",
     "platforms": ["ios", "android"],
@@ -19,3 +19,4 @@
     }
   }
 }
+
