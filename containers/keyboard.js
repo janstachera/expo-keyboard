@@ -6,23 +6,22 @@ import { keyboardStyle, suggestionsStyle, viewStyle } from '../styles';
 export default class Keyboard extends React.Component {
 
     inputCharacter = (character) => {
-        const text = this.state.text;
-        const position = this.state.cursorPosition;
+        const text = this.props.text;
+        const position = this.props.cursorPosition;
         const output = text.substr(0, position) + character + text.substr(position);
 
         this.upgradeCursorPosition(position);
 
         if (character === ' ') {
-            this.setState({
+            this.props.setMainContainerState({
                 currentWord: '',
-                dictionary: fullDictionary.slice(),
                 text: output,
                 cursorPosition: position + 1
             });
         } else {
-            const currrentWord = `${this.state.currentWord}${character}`;
-            const newCandWords = this.state.dictionary.filter((word) => word.indexOf(currrentWord) === 0);
-            this.setState({
+            const currrentWord = `${this.props.currentWord}${character}`;
+            const newCandWords = this.props.dictionary.filter((word) => word.indexOf(currrentWord) === 0);
+            this.props.setMainContainerState({
                 currentWord: currrentWord,
                 dictionary: newCandWords,
                 text: output,
@@ -94,7 +93,7 @@ export default class Keyboard extends React.Component {
                         key='bksp'
                         style={keyboardStyle.button}
                         onPress={() => this.removeCharacter()}
-                        onLongPress={() => this.setState({...INIT_STATE})}
+                        onLongPress={() => this.props.setMainContainerState({...INIT_STATE})}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
                             {'bksp'}

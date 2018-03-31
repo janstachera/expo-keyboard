@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
-import { Keyboard } from './containers';
+import Keyboard from "./containers/keyboard";
+import FingerTracer from "./containers/finger-tracer";
 
 let inwokacja = 'Litwo! Ojczyzno moja! Ty jesteś jak zdrowie, Ile cię trzeba cenić, ten tylko się dowie, Kto cię stracił. Dziś piękność twą w całej ozdobie Widzę i opisuję, bo tęsknię po tobie Panno święta, co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie! Ty, co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem! Jak mnie dziecko do zdrowia powróciłaś cudem, (Gdy od płaczącej matki pod Twoją opiekę Ofiarowany, martwą podniosłem powiekę';
 inwokacja = inwokacja.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
@@ -17,8 +17,6 @@ const INIT_STATE = {
     dictionary: fullDictionary.slice(),
     currentWord: '',
     svgVisible: false,
-    fingerTrace: [],
-    fingerString: '',
 };
 
 export default class App extends React.Component {
@@ -28,8 +26,12 @@ export default class App extends React.Component {
         this.state = {...INIT_STATE};
     }
 
+    handleKeyboardSetState = (args) => {
+        this.setState({ ...args });
+    };
+
     resetDictionary = () => {
-        this.setState({dictionary: fullDictionary.slice()});
+        this.setState({ dictionary: fullDictionary.slice() });
     };
 
     upgradeCursorPosition = (position) => {
@@ -72,50 +74,6 @@ export default class App extends React.Component {
         this.upgradeCursorPosition(position);
     };
 
-    hideSvg = () => {
-        this.setState({
-            svgVisible: false,
-        });
-    };
-
-    showSvg = () => {
-        this.setState({
-            svgVisible: true,
-        });
-    };
-
-    handleSvgMove = (e, t) => {
-        let trace = t.state.fingerTrace;
-        const coords = Math.round(e.nativeEvent.pageX) + ' ' + Math.round(e.nativeEvent.pageY - 450) + ' ';
-        trace.push(coords);
-        // if (trace.length > 20) {
-        //     trace.splice(0, 1);
-        // }
-        let points = 'M' + trace.reduce(
-            (ac, el, ind, arr) => ind % 2 === 0
-                ? ac + el
-                : ind === arr.length - 1
-                    ? ac + 'L' + el
-                    : ac + 'Q' + el,
-            ''
-        );
-        console.log(points);
-        t.state.fingerTrace = trace;
-        t.state.fingerString = points;
-        // t.setState({ fingerTrace: trace, fingerString: points });
-    };
-
-    createSvgStyle = () => ({
-        height: 192,
-        borderColor: 'red',
-        borderWidth: 5,
-        width: 360,
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        zIndex: this.state.svgVisible ? 100 : -100,
-    });
-
     render() {
         const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
 
@@ -156,16 +114,10 @@ export default class App extends React.Component {
                       suggestions.length > 2 ? createSuggButton(suggestions[2], 2) : null
                     }
                 </View>
-                <Svg
-                    style={this.createSvgStyle()}
-                >
-                    <Path
-                        d={this.state.fingerString}
-                        fill="none"
-                        stroke="red"
-                        strokeWidth="5"
-                    />
-                </Svg>
+                <FingerTracer
+                    visible={this.state.svgVisible}
+                    ref={(fingerTracer) => this.fingerTracer = fingerTracer}
+                />
                 <View
                     style={keyboardStyle.keyboard}
                     onStartShouldSetResponder={
@@ -173,22 +125,32 @@ export default class App extends React.Component {
                     }
                     onMoveShouldSetResponder={
                         () => {
-                            this.setState({ svgVisible: true });
                             return true;
+                        }
+                    }
+                    onResponderGrant={
+                        () => {
+                            this.fingerTracer.handleFingerDown();
                         }
                     }
                     onResponderMove={
                         (e) => {
-                            this.handleSvgMove(e, this);
+                            this.fingerTracer.handleMove(e);
                         }
                     }
                     onResponderRelease={
                         () => {
-                            this.setState({ svgVisible: false, fingerTrace: [], });
+                            this.fingerTracer.handleFingerUp();
                         }
                     }
                 >
-                    <Keyboard />
+                    <Keyboard
+                        setMainContainerState={this.handleKeyboardSetState}
+                        text={this.state.text}
+                        cursorPosition={this.state.cursorPosition}
+                        dictionary={this.state.dictionary}
+                        currentWord={this.state.currentWord}
+                    />
                 </View>
             </View>
         );

@@ -4,7 +4,10 @@ import Svg, { Path } from 'react-native-svg';
 const INIT_STATE = {
     fingerTrace: [],
     fingerString: '',
+    visible: false,
 };
+
+let wiperBreak = false;
 
 export default class FingerTracer extends React.Component {
 
@@ -13,26 +16,105 @@ export default class FingerTracer extends React.Component {
         this.state = {...INIT_STATE};
     }
 
+    createSvgStyle = () => ({
+        height: 192,
+        borderColor: 'red',
+        borderWidth: 5,
+        width: 360,
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        zIndex: this.state.visible ? 100 : -100,
+    });
+
+    handleFingerDown = () => {
+        wiperBreak = true;
+        this.setState({ ...INIT_STATE, visible: true, });
+        this.updateTrace(INIT_STATE.fingerTrace);
+    };
+
+    handleFingerUp = () => {
+        wiperBreak = false;
+        this.setState({ ...INIT_STATE, visible: true, });
+        const traceWiper = () => {
+            if (!wiperBreak) {
+                let trace = this.state.fingerTrace.slice();
+                trace.splice(0, 4);
+                this.updateTrace(trace);
+                if (trace.length > 0) {
+                    setTimeout(traceWiper, 20);
+                } else {
+                    this.setState(...INIT_STATE);
+                }
+            }
+        };
+        traceWiper();
+    };
+
     handleMove = (e) => {
-        let trace = this.state.fingerTrace;
+        let trace = this.state.fingerTrace.slice();
         const coords = Math.round(e.nativeEvent.pageX) + ' ' + Math.round(e.nativeEvent.pageY - 450) + ' ';
         trace.push(coords);
-        if (trace.length > 20) {
+        if (trace.length > 50) {
             trace.splice(0, 1);
         }
+        this.updateTrace(trace);
+    };
+
+    updateTrace = (trace) => {
+        // let points = 'M' + trace.reduce(
+        //     (ac, el, ind, arr) => ind % 2 === 0
+        //         ? ac + el
+        //         : ind === arr.length - 1
+        //             ? ac + 'L' + el
+        //             : ac + 'Q' + el,
+        //     ''
+        // );
         let points = 'M' + trace.reduce(
             (ac, el, ind, arr) => ind % 2 === 0
                 ? ac + el
-                : ind === arr.length - 1
-                    ? ac + 'L' + el
-                    : ac + 'Q' + el,
+                : ac + 'L' + el,
             ''
         );
-        console.log(points);
-        // t.state.fingerTrace = trace;
-        // t.state.fingerString = points;
         this.setState({ fingerTrace: trace, fingerString: points });
     };
 
+    render () {
+        return (
+            <Svg
+                style={this.createSvgStyle()}
+                onStartShouldSetResponder={
+                    () => true
+                }
+                onMoveShouldSetResponder={
+                    () => {
+                        return true;
+                    }
+                }
+                onResponderGrant={
+                    () => {
+                        this.handleFingerDown();
+                    }
+                }
+                onResponderMove={
+                    (e) => {
+                        this.handleMove(e);
+                    }
+                }
+                onResponderRelease={
+                    () => {
+                        this.handleFingerUp();
+                    }
+                }
+            >
+                <Path
+                    d={this.state.fingerString}
+                    fill="none"
+                    stroke="red"
+                    strokeWidth="5"
+                />
+            </Svg>
+        );
+    }
 
 }
