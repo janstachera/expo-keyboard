@@ -34,18 +34,6 @@ export default class App extends React.Component {
         this.setState({ dictionary: fullDictionary.slice() });
     };
 
-    upgradeCursorPosition = (position) => {
-        this._textInput.setNativeProps(
-            {
-                selection:
-                    {
-                        end: position + 1,
-                        start: position + 1,
-                    },
-            }
-        );
-    };
-
     removeCharacter = () => {
         const text = this.state.text;
         const position = this.state.cursorPosition;
@@ -77,19 +65,6 @@ export default class App extends React.Component {
     render() {
         const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
 
-
-        const createSuggButton = (word, index) => (
-            <TouchableOpacity
-                key={`sugg${index}`}
-                style={suggestionsStyle.suggButton}
-                onPress={() => this.chooseSuggestion(word)}
-            >
-              <Text style={suggestionsStyle.suggButtonLabel} >
-                  {word}
-              </Text>
-            </TouchableOpacity>
-        );
-
         return (
             <View style={viewStyle.container}>
                 <View style={viewStyle.preview}>
@@ -103,54 +78,35 @@ export default class App extends React.Component {
                         disabled
                     />
                 </View>
-                <View style={suggestionsStyle.suggestions}>
-                    {
-                      suggestions.length > 1 ? createSuggButton(suggestions[1], 1) : null
-                    }
-                    {
-                      suggestions.length > 0 ? createSuggButton(suggestions[0], 0) : null
-                    }
-                    {
-                      suggestions.length > 2 ? createSuggButton(suggestions[2], 2) : null
-                    }
-                </View>
                 <FingerTracer
                     visible={this.state.svgVisible}
                     ref={(fingerTracer) => this.fingerTracer = fingerTracer}
                 />
                 <View
-                    style={keyboardStyle.keyboard}
-                    onStartShouldSetResponder={
-                        () => true
-                    }
-                    onMoveShouldSetResponder={
-                        () => {
-                            return true;
-                        }
-                    }
-                    onResponderGrant={
-                        () => {
-                            this.fingerTracer.handleFingerDown();
-                        }
-                    }
-                    onResponderMove={
-                        (e) => {
-                            this.fingerTracer.handleMove(e);
-                        }
-                    }
-                    onResponderRelease={
-                        () => {
-                            this.fingerTracer.handleFingerUp();
-                        }
-                    }
+                    // style={keyboardStyle.keyboard}
+                    onStartShouldSetResponder={() => true}
+                    onMoveShouldSetResponder={() => true}
+                    onResponderGrant={() => { this.fingerTracer.handleFingerDown(); }}
+                    onResponderMove={(e) => { this.fingerTracer.handleMove(e); }}
+                    onResponderRelease={() => { this.fingerTracer.handleFingerUp(); }}
                 >
-                    <Keyboard
-                        setMainContainerState={this.handleKeyboardSetState}
-                        text={this.state.text}
-                        cursorPosition={this.state.cursorPosition}
-                        dictionary={this.state.dictionary}
-                        currentWord={this.state.currentWord}
-                    />
+                    <View style={suggestionsStyle.suggestions}>
+                        { suggestions.length > 1 ? createSuggButton(suggestions[1], 1) : null }
+                        { suggestions.length > 0 ? createSuggButton(suggestions[0], 0) : null }
+                        { suggestions.length > 2 ? createSuggButton(suggestions[2], 2) : null }
+                    </View>
+                    <View
+                        style={keyboardStyle.keyboard}
+                    >
+                        <Keyboard
+                            setContainerState={this.handleKeyboardSetState}
+                            text={this.state.text}
+                            cursorPosition={this.state.cursorPosition}
+                            dictionary={this.state.dictionary}
+                            currentWord={this.state.currentWord}
+                            textInput={this._textInput}
+                        />
+                    </View>
                 </View>
             </View>
         );

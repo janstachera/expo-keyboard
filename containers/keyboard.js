@@ -6,22 +6,28 @@ import { keyboardStyle, suggestionsStyle, viewStyle } from '../styles';
 export default class Keyboard extends React.Component {
 
     inputCharacter = (character) => {
-        const text = this.props.text;
-        const position = this.props.cursorPosition;
+        const {
+            text,
+            cursorPosition,
+            setContainerState,
+            dictionary,
+        } = this.props;
+
+        const position = cursorPosition;
         const output = text.substr(0, position) + character + text.substr(position);
 
-        this.upgradeCursorPosition(position);
+        this.updateCursorPosition(position);
 
         if (character === ' ') {
-            this.props.setMainContainerState({
+            setContainerState({
                 currentWord: '',
                 text: output,
                 cursorPosition: position + 1
             });
         } else {
             const currrentWord = `${this.props.currentWord}${character}`;
-            const newCandWords = this.props.dictionary.filter((word) => word.indexOf(currrentWord) === 0);
-            this.props.setMainContainerState({
+            const newCandWords = dictionary.filter((word) => word.indexOf(currrentWord) === 0);
+            setContainerState({
                 currentWord: currrentWord,
                 dictionary: newCandWords,
                 text: output,
@@ -31,7 +37,30 @@ export default class Keyboard extends React.Component {
 
     };
 
+    updateCursorPosition = (position) => {
+        // this.props.textInput.setNativeProps({
+        //     selection: {
+        //         end: position + 1,
+        //         start: position + 1,
+        //     },
+        // });
+    };
+
     render() {
+        const suggestions = [];
+
+        const createSuggButton = (word, index) => (
+            <TouchableOpacity
+                key={`sugg${index}`}
+                style={suggestionsStyle.suggButton}
+                onPress={() => this.chooseSuggestion(word)}
+            >
+                <Text style={suggestionsStyle.suggButtonLabel} >
+                    {word}
+                </Text>
+            </TouchableOpacity>
+        );
+
         const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
         const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
         const row3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];

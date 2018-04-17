@@ -44,7 +44,7 @@ export default class FingerTracer extends React.Component {
                 if (trace.length > 0) {
                     setTimeout(traceWiper, 20);
                 } else {
-                    this.setState(...INIT_STATE);
+                    this.setState({ ...INIT_STATE });
                 }
             }
         };
