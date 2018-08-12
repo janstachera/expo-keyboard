@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { keyboardStyle, suggestionsStyle, viewStyle } from '../styles';
 
 export default class Keyboard extends React.Component {

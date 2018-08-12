@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const suggestionsStyle = StyleSheet.create({
     suggestions: {
-        flex: 0.07,
+        flex: 0.2,
         borderTopWidth: 1,
         borderBottomWidth: 1,
         borderColor: '#ccc',

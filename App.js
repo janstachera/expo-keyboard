@@ -16,7 +16,7 @@ const INIT_STATE = {
     cursorPosition: 0,
     dictionary: fullDictionary.slice(),
     currentWord: '',
-    svgVisible: false,
+    svgVisible: true,
 };
 
 export default class App extends React.Component {
@@ -83,7 +83,7 @@ export default class App extends React.Component {
                     ref={(fingerTracer) => this.fingerTracer = fingerTracer}
                 />
                 <View
-                    // style={keyboardStyle.keyboard}
+                    style={keyboardStyle.keyboard}
                     onStartShouldSetResponder={() => true}
                     onMoveShouldSetResponder={() => true}
                     onResponderGrant={() => { this.fingerTracer.handleFingerDown(); }}
@@ -95,9 +95,6 @@ export default class App extends React.Component {
                         { suggestions.length > 0 ? createSuggButton(suggestions[0], 0) : null }
                         { suggestions.length > 2 ? createSuggButton(suggestions[2], 2) : null }
                     </View>
-                    <View
-                        style={keyboardStyle.keyboard}
-                    >
                         <Keyboard
                             setContainerState={this.handleKeyboardSetState}
                             text={this.state.text}
@@ -106,7 +103,6 @@ export default class App extends React.Component {
                             currentWord={this.state.currentWord}
                             textInput={this._textInput}
                         />
-                    </View>
                 </View>
             </View>
         );

@@ -1,5 +1,6 @@
 import React from 'react';
-import Svg, { Path } from 'react-native-svg';
+// import Svg, { Path } from 'react-native-svg';
+import { Svg } from 'expo';
 
 const INIT_STATE = {
     fingerTrace: [],
@@ -17,10 +18,10 @@ export default class FingerTracer extends React.Component {
     }
 
     createSvgStyle = () => ({
-        height: 192,
+        height: 220,
         borderColor: 'red',
         borderWidth: 5,
-        width: 360,
+        width: "100%",
         position: 'absolute',
         bottom: 0,
         left: 0,
@@ -53,7 +54,7 @@ export default class FingerTracer extends React.Component {
 
     handleMove = (e) => {
         let trace = this.state.fingerTrace.slice();
-        const coords = Math.round(e.nativeEvent.pageX) + ' ' + Math.round(e.nativeEvent.pageY - 450) + ' ';
+        const coords = Math.round(e.nativeEvent.pageX) + ' ' + Math.round(e.nativeEvent.pageY - 463) + ' ';
         trace.push(coords);
         if (trace.length > 50) {
             trace.splice(0, 1);
@@ -107,11 +108,11 @@ export default class FingerTracer extends React.Component {
                     }
                 }
             >
-                <Path
+                <Svg.Path
                     d={this.state.fingerString}
                     fill="none"
                     stroke="red"
-                    strokeWidth="5"
+                    strokeWidth={5}
                 />
             </Svg>
         );
