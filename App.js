@@ -4,14 +4,9 @@ import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
 import MyKeyboard from "./containers/keyboard";
 import FingerTracer from "./containers/finger-tracer";
 import { Keyboard } from 'react-native';
-import wordlist from 'wordlist-english';
+import { dictionary } from './dictionary';
 
-let inwokacja = 'Litwo! Ojczyzno moja! Ty jesteś jak zdrowie, Ile cię trzeba cenić, ten tylko się dowie, Kto cię stracił. Dziś piękność twą w całej ozdobie Widzę i opisuję, bo tęsknię po tobie Panno święta, co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie! Ty, co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem! Jak mnie dziecko do zdrowia powróciłaś cudem, (Gdy od płaczącej matki pod Twoją opiekę Ofiarowany, martwą podniosłem powiekę';
-inwokacja = inwokacja.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-inwokacja = inwokacja.toLowerCase();
-inwokacja = inwokacja.split(' ');
-inwokacja = inwokacja.filter((word, index, arr) => arr.indexOf(word) === index);
-const fullDictionary = inwokacja.sort((a,b) => a.length - b.length );
+let fullDictionary = [];
 
 const INIT_STATE = {
     text: '',
@@ -27,6 +22,10 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {...INIT_STATE};
+    }
+
+    componentDidMount() {
+        setTimeout(() => this.setState({ dictionary: fullDictionary }), 1000);
     }
 
     handleKeyboardSetState = (args) => {
@@ -79,8 +78,7 @@ export default class App extends React.Component {
     };
 
     render() {
-
-        console.log('->', wordlist);
+        if (dictionary) { fullDictionary = dictionary.slice(0,4).map(dict => dict.default).reduce((acc,dict) => acc.concat(dict), []); }
         const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
         return (
             <View style={viewStyle.container}>
