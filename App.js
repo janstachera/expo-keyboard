@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
-import Keyboard from "./containers/keyboard";
+import MyKeyboard from "./containers/keyboard";
 import FingerTracer from "./containers/finger-tracer";
+import { Keyboard } from 'react-native';
+import wordlist from 'wordlist-english';
 
 let inwokacja = 'Litwo! Ojczyzno moja! Ty jesteś jak zdrowie, Ile cię trzeba cenić, ten tylko się dowie, Kto cię stracił. Dziś piękność twą w całej ozdobie Widzę i opisuję, bo tęsknię po tobie Panno święta, co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie! Ty, co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem! Jak mnie dziecko do zdrowia powróciłaś cudem, (Gdy od płaczącej matki pod Twoją opiekę Ofiarowany, martwą podniosłem powiekę';
 inwokacja = inwokacja.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
@@ -18,6 +20,7 @@ const INIT_STATE = {
     currentWord: '',
     svgVisible: true,
 };
+const suggestions = [];
 
 export default class App extends React.Component {
 
@@ -38,13 +41,26 @@ export default class App extends React.Component {
         const text = this.state.text;
         const position = this.state.cursorPosition;
         const output = text.substr(0, position - 1) + text.substr(position);
+        console.log(text, position, output);
         this.setState({
             text: output,
-            cursorPosition: position + 1,
+            cursorPosition: position - 1,
             currentWord: '',
             dictionary: fullDictionary.slice(),
         });
     };
+
+    createSuggButton = (word, index) => (
+        <TouchableOpacity
+            key={`sugg${index}`}
+            style={suggestionsStyle.suggButton}
+            onPress={() => this.chooseSuggestion(word)}
+        >
+            <Text style={suggestionsStyle.suggButtonLabel} >
+                {word}
+            </Text>
+        </TouchableOpacity>
+    );
 
     chooseSuggestion = (word) => {
         const textToTheLeft = this.state.text.slice(0, this.state.cursorPosition);
@@ -59,23 +75,27 @@ export default class App extends React.Component {
             currentWord: '',
         });
 
-        this.upgradeCursorPosition(position);
+        // this.upgradeCursorPosition(position);
     };
 
     render() {
-        const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
 
+        console.log('->', wordlist);
+        const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
         return (
             <View style={viewStyle.container}>
                 <View style={viewStyle.preview}>
                     <TextInput
                         style={viewStyle.inputField}
                         value={this.state.text}
-                        onChangeText={(text) => this.setState(text)}
+                        onChangeText={(text) => {
+                            this.setState(text);
+                            this._textInput.focus();
+                        }}
+                        // onFocus={() => { Keyboard.dismiss(); }}
                         onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }) }}
                         ref={component => this._textInput = component}
                         multiline
-                        disabled
                     />
                 </View>
                 <FingerTracer
@@ -91,11 +111,12 @@ export default class App extends React.Component {
                     onResponderRelease={() => { this.fingerTracer.handleFingerUp(); }}
                 >
                     <View style={suggestionsStyle.suggestions}>
-                        { suggestions.length > 1 ? createSuggButton(suggestions[1], 1) : null }
-                        { suggestions.length > 0 ? createSuggButton(suggestions[0], 0) : null }
-                        { suggestions.length > 2 ? createSuggButton(suggestions[2], 2) : null }
+                        { suggestions.length > 1 ? this.createSuggButton(suggestions[1], 1) : null }
+                        { suggestions.length > 0 ? this.createSuggButton(suggestions[0], 0) : null }
+                        { suggestions.length > 2 ? this.createSuggButton(suggestions[2], 2) : null }
                     </View>
-                        <Keyboard
+                        <MyKeyboard
+                            removeCharacter={this.removeCharacter}
                             setContainerState={this.handleKeyboardSetState}
                             text={this.state.text}
                             cursorPosition={this.state.cursorPosition}

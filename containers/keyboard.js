@@ -46,19 +46,6 @@ export default class Keyboard extends React.Component {
     };
 
     render() {
-        const suggestions = [];
-
-        const createSuggButton = (word, index) => (
-            <TouchableOpacity
-                key={`sugg${index}`}
-                style={suggestionsStyle.suggButton}
-                onPress={() => this.chooseSuggestion(word)}
-            >
-                <Text style={suggestionsStyle.suggButtonLabel} >
-                    {word}
-                </Text>
-            </TouchableOpacity>
-        );
 
         const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
         const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
@@ -120,7 +107,7 @@ export default class Keyboard extends React.Component {
                         title=' '
                         key='bksp'
                         style={keyboardStyle.button}
-                        onPress={() => this.removeCharacter()}
+                        onPress={() => this.props.removeCharacter()}
                         onLongPress={() => this.props.setMainContainerState({...INIT_STATE})}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
