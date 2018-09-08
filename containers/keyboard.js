@@ -4,45 +4,45 @@ import { keyboardStyle, suggestionsStyle, viewStyle } from '../styles';
 
 export default class Keyboard extends React.Component {
 
+    handleSpacePress = () => {
+        const {
+            cursorPosition,
+            setContainerState,
+            text,
+            updateCursorPosition,
+        } = this.props;
+
+        updateCursorPosition(cursorPosition + 1);
+
+        setContainerState({
+            currentWord: '',
+            text: text.substr(0, cursorPosition) + ' ' + text.substr(cursorPosition),
+            cursorPosition: cursorPosition + 1,
+        });
+    };
+
     inputCharacter = (character) => {
         const {
             text,
             cursorPosition,
+            currentWord,
             setContainerState,
             dictionary,
+            updateCursorPosition,
         } = this.props;
 
-        const position = cursorPosition;
-        const output = text.substr(0, position) + character + text.substr(position);
+        const newCurrentWord = `${currentWord}${character}`;
+        const newCandWords = dictionary.filter((word) => word.indexOf(newCurrentWord) === 0);
 
-        this.updateCursorPosition(position);
+        updateCursorPosition(cursorPosition + 1);
 
-        if (character === ' ') {
-            setContainerState({
-                currentWord: '',
-                text: output,
-                cursorPosition: position + 1
-            });
-        } else {
-            const currrentWord = `${this.props.currentWord}${character}`;
-            const newCandWords = dictionary.filter((word) => word.indexOf(currrentWord) === 0);
-            setContainerState({
-                currentWord: currrentWord,
-                dictionary: newCandWords,
-                text: output,
-                cursorPosition: position + 1
-            });
-        }
+        setContainerState({
+            currentWord: newCurrentWord,
+            dictionary: newCandWords,
+            text: `${text.substr(0, cursorPosition)}${character}${text.substr(cursorPosition)}`,
+            cursorPosition: cursorPosition + 1,
+        });
 
-    };
-
-    updateCursorPosition = (position) => {
-        // this.props.textInput.setNativeProps({
-        //     selection: {
-        //         end: position + 1,
-        //         start: position + 1,
-        //     },
-        // });
     };
 
     render() {
@@ -97,7 +97,7 @@ export default class Keyboard extends React.Component {
                         title=' '
                         key='space'
                         style={keyboardStyle.space}
-                        onPress={() => this.inputCharacter(' ')}
+                        onPress={this.handleSpacePress}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
                             {' '}
@@ -107,8 +107,8 @@ export default class Keyboard extends React.Component {
                         title=' '
                         key='bksp'
                         style={keyboardStyle.button}
-                        onPress={() => this.props.removeCharacter()}
-                        onLongPress={() => this.props.setMainContainerState({...INIT_STATE})}
+                        onPress={this.props.removeCharacter}
+                        onLongPress={this.props.resetMainState}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
                             {'bksp'}

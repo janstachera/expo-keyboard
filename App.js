@@ -25,25 +25,30 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        setTimeout(() => this.setState({ dictionary: fullDictionary }), 1000);
+        setTimeout(() => this.setState({
+            dictionary: fullDictionary
+        }), 1000);
     }
 
     handleKeyboardSetState = (args) => {
         this.setState({ ...args });
     };
 
-    resetDictionary = () => {
-        this.setState({ dictionary: fullDictionary.slice() });
+    resetMainState = () => {
+        this.setState(INIT_STATE);
     };
 
     removeCharacter = () => {
-        const text = this.state.text;
-        const position = this.state.cursorPosition;
-        const output = text.substr(0, position - 1) + text.substr(position);
-        console.log(text, position, output);
+        const {
+            text,
+            cursorPosition,
+        } = this.state;
+
+        const output = text.substr(0, cursorPosition - 1) + text.substr(cursorPosition);
+
         this.setState({
             text: output,
-            cursorPosition: position - 1,
+            cursorPosition: cursorPosition - 1,
             currentWord: '',
             dictionary: fullDictionary.slice(),
         });
@@ -61,11 +66,28 @@ export default class App extends React.Component {
         </TouchableOpacity>
     );
 
+    updateCursorPosition = (position) => {
+        this._textInput.setNativeProps({
+            selection: {
+                end: position,
+                start: position ,
+            },
+        });
+    };
+
     chooseSuggestion = (word) => {
-        const textToTheLeft = this.state.text.slice(0, this.state.cursorPosition);
-        const startOfWord = textToTheLeft.lastIndexOf(this.state.currentWord);
-        const newText = this.state.text.substr(0, startOfWord) + word + ' ' + this.state.text.substr(this.state.cursorPosition);
-        const position = startOfWord + word.length + 1;
+        const {
+            currentWord,
+            cursorPosition,
+            text,
+        } = this.state;
+
+        const partOfWordToAdd = word.substr(currentWord.length);
+
+        const newText = text.substr(0, cursorPosition) + partOfWordToAdd + ' ' + text.substr(cursorPosition);
+        const position = cursorPosition + partOfWordToAdd.length + 1;
+
+        this.updateCursorPosition(position);
 
         this.setState({
             dictionary: fullDictionary.slice(),
@@ -73,12 +95,10 @@ export default class App extends React.Component {
             cursorPosition: position,
             currentWord: '',
         });
-
-        // this.upgradeCursorPosition(position);
     };
 
     render() {
-        if (dictionary) { fullDictionary = dictionary.slice(0,4).map(dict => dict.default).reduce((acc,dict) => acc.concat(dict), []); }
+        if (dictionary && fullDictionary.length === 0) { fullDictionary = dictionary.slice(0,4).map(dict => dict.default).reduce((acc,dict) => acc.concat(dict), []); }
         const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
         return (
             <View style={viewStyle.container}>
@@ -86,12 +106,9 @@ export default class App extends React.Component {
                     <TextInput
                         style={viewStyle.inputField}
                         value={this.state.text}
-                        onChangeText={(text) => {
-                            this.setState(text);
-                            this._textInput.focus();
-                        }}
+                        selectTextOnFocus={false}
                         // onFocus={() => { Keyboard.dismiss(); }}
-                        onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }) }}
+                        onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }); }}
                         ref={component => this._textInput = component}
                         multiline
                     />
@@ -121,6 +138,8 @@ export default class App extends React.Component {
                             dictionary={this.state.dictionary}
                             currentWord={this.state.currentWord}
                             textInput={this._textInput}
+                            resetMainState={this.resetMainState}
+                            updateCursorPosition={this.updateCursorPosition}
                         />
                 </View>
             </View>
