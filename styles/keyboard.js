@@ -17,12 +17,6 @@ export const keyboardStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
     },
-    row2spacer: {
-        flex: 0.045,
-    },
-    row3spacer: {
-        flex: 0.09,
-    },
     space: {
         flex: 0.6,
         borderRadius: 10,

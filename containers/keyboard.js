@@ -54,13 +54,6 @@ export default class Keyboard extends React.Component {
         const addKeyboardRow = (row, index) =>
             (<View style={keyboardStyle.keyboardRow} key={`row${index}`}>
                 {
-                    index === 1
-                        ? <View style={keyboardStyle.row2spacer}/>
-                        : index === 2
-                        ? <View style={keyboardStyle.row3spacer}/>
-                        : null
-                }
-                {
                     row.map(
                         elem =>
                             <TouchableOpacity
@@ -74,13 +67,6 @@ export default class Keyboard extends React.Component {
                                 </Text>
                             </TouchableOpacity>
                     )
-                }
-                {
-                    index === 1
-                        ? <View style={keyboardStyle.row2spacer}/>
-                        : index === 2
-                        ? <View style={keyboardStyle.row3spacer}/>
-                        : null
                 }
             </View>);
         return (

@@ -54,12 +54,49 @@ export default class FingerTracer extends React.Component {
 
     handleMove = (e) => {
         let trace = this.state.fingerTrace.slice();
-        const coords = Math.round(e.nativeEvent.pageX) + ' ' + Math.round(e.nativeEvent.pageY - Dimensions.get('window').height * 0.675) + ' ';
+        const {
+            pageX,
+            pageY,
+        } = e.nativeEvent;
+        const {
+            height,
+            width,
+        } = Dimensions.get('window');
+
+        const topOfKbOffset = height * 0.676;
+        const coords = Math.round(pageX) + ' ' + Math.round(pageY - topOfKbOffset) + ' ';
+
+        const xRatio = 100*pageX/width;
+        const yRatio = 100*(pageY-topOfKbOffset)/(height - topOfKbOffset);
+
+        console.log(this.resolveLetter(xRatio, yRatio));
+
         trace.push(coords);
         if (trace.length > 50) {
             trace.splice(0, 1);
         }
         this.updateTrace(trace);
+    };
+
+    resolveLetter = (xRatio, yRatio) => {
+
+        const rowDividers = [10, 11.112, 14.286];
+        const letters = [
+            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+        ];
+
+        switch (true) {
+            case (yRatio < 25):
+                return letters[0][Math.floor(xRatio/rowDividers[0])];
+            case (yRatio < 50):
+                return letters[1][Math.floor(xRatio/rowDividers[1])];
+            case (yRatio < 75):
+                return letters[2][Math.floor(xRatio/rowDividers[2])];
+            default:
+                return '';
+        }
     };
 
     updateTrace = (trace) => {
