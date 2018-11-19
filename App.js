@@ -8,6 +8,20 @@ import { dictionary } from './dictionary';
 
 let fullDictionary = [];
 
+
+const arrToObj = (arr) =>
+    arr.reduce((acc, word) => {
+        let pointer = acc;
+        [...word].forEach((letter) => {
+            if (pointer[letter] === undefined) {
+                pointer[letter] = {};
+            }
+            pointer = pointer[letter];
+        });
+        pointer['0'] = word;
+        return acc;
+    }, {});
+
 const INIT_STATE = {
     text: '',
     cursorPosition: 0,
@@ -97,8 +111,16 @@ export default class App extends React.Component {
         });
     };
 
+    prepareDictionary = () => {
+        fullDictionary = arrToObj(dictionary
+            .slice(0,4)
+            .map(dict => dict.default)
+            .reduce((acc,dict) => acc.concat(dict), [])
+        );
+    };
+
     render() {
-        if (dictionary && fullDictionary.length === 0) { fullDictionary = dictionary.slice(0,4).map(dict => dict.default).reduce((acc,dict) => acc.concat(dict), []); }
+        if (dictionary && fullDictionary.length === 0) { this.prepareDictionary(); }
         const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
         return (
             <View style={viewStyle.container}>
@@ -114,6 +136,7 @@ export default class App extends React.Component {
                     />
                 </View>
                 <FingerTracer
+                    dictionary={fullDictionary}
                     visible={this.state.svgVisible}
                     ref={(fingerTracer) => this.fingerTracer = fingerTracer}
                 />

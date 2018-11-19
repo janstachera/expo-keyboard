@@ -3,8 +3,10 @@ import { Svg } from 'expo';
 import { Dimensions } from 'react-native'
 
 const INIT_STATE = {
+    unfinishedCandidates: [],
     fingerTrace: [],
     fingerString: '',
+    lastLetter: '',
     visible: false,
 };
 
@@ -69,13 +71,44 @@ export default class FingerTracer extends React.Component {
         const xRatio = 100*pageX/width;
         const yRatio = 100*(pageY-topOfKbOffset)/(height - topOfKbOffset);
 
-        console.log(this.resolveLetter(xRatio, yRatio));
+        // console.log(this.resolveLetter(xRatio, yRatio));
+        this.updateCandidates(this.resolveLetter(xRatio, yRatio));
 
         trace.push(coords);
         if (trace.length > 50) {
             trace.splice(0, 1);
         }
         this.updateTrace(trace);
+    };
+
+    updateCandidates = (newLetter) => {
+        const { unfinishedCandidates, lastLetter } = this.state;
+
+        if (lastLetter === newLetter) { return; }
+        if (unfinishedCandidates.length === 0) {
+            this.setState({ unfinishedCandidates: [newLetter], lastLetter: newLetter });
+        } else {
+            const newUnfinishedCandidatees = unfinishedCandidates.slice();
+            const cands = [];
+            unfinishedCandidates.forEach(unfinCandidate => {
+                const path = this.followDictionary(unfinCandidate);
+                if (path !== undefined && path[newLetter] !== undefined) {
+                    newUnfinishedCandidatees.push(`${unfinCandidate}${newLetter}`);
+                    if (path[newLetter][0]) { cands.push(path[newLetter][0]); }
+                }
+            });
+            console.log('\n-------\n', cands);
+            this.setState({ unfinishedCandidates: newUnfinishedCandidatees, lastLetter: newLetter });
+        }
+
+    };
+
+    followDictionary = (path) => {
+        const letters = [...path];
+        const { dictionary } = this.props;
+        let pointer = dictionary;
+        letters.forEach(letter => pointer = pointer[letter]);
+        return pointer;
     };
 
     resolveLetter = (xRatio, yRatio) => {
