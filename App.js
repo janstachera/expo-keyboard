@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-nati
 import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
 import MyKeyboard from "./containers/keyboard";
 import FingerTracer from "./containers/finger-tracer";
+import { Suggestions } from "./containers/suggestions";
 import { Keyboard } from 'react-native';
 import { dictionary } from './dictionary';
 
@@ -67,18 +68,6 @@ export default class App extends React.Component {
             dictionary: fullDictionary.slice(),
         });
     };
-
-    createSuggButton = (word, index) => (
-        <TouchableOpacity
-            key={`sugg${index}`}
-            style={suggestionsStyle.suggButton}
-            onPress={() => this.chooseSuggestion(word)}
-        >
-            <Text style={suggestionsStyle.suggButtonLabel} >
-                {word}
-            </Text>
-        </TouchableOpacity>
-    );
 
     updateCursorPosition = (position) => {
         this._textInput.setNativeProps({
@@ -148,22 +137,20 @@ export default class App extends React.Component {
                     onResponderMove={(e) => { this.fingerTracer.handleMove(e); }}
                     onResponderRelease={() => { this.fingerTracer.handleFingerUp(); }}
                 >
-                    <View style={suggestionsStyle.suggestions}>
-                        { suggestions.length > 1 ? this.createSuggButton(suggestions[1], 1) : null }
-                        { suggestions.length > 0 ? this.createSuggButton(suggestions[0], 0) : null }
-                        { suggestions.length > 2 ? this.createSuggButton(suggestions[2], 2) : null }
-                    </View>
-                        <MyKeyboard
-                            removeCharacter={this.removeCharacter}
-                            setContainerState={this.handleKeyboardSetState}
-                            text={this.state.text}
-                            cursorPosition={this.state.cursorPosition}
-                            dictionary={this.state.dictionary}
-                            currentWord={this.state.currentWord}
-                            textInput={this._textInput}
-                            resetMainState={this.resetMainState}
-                            updateCursorPosition={this.updateCursorPosition}
-                        />
+                    <Suggestions
+                        onChooseSuggestion={this.chooseSuggestion}
+                    />
+                    <MyKeyboard
+                        removeCharacter={this.removeCharacter}
+                        setContainerState={this.handleKeyboardSetState}
+                        text={this.state.text}
+                        cursorPosition={this.state.cursorPosition}
+                        dictionary={this.state.dictionary}
+                        currentWord={this.state.currentWord}
+                        textInput={this._textInput}
+                        resetMainState={this.resetMainState}
+                        updateCursorPosition={this.updateCursorPosition}
+                    />
                 </View>
             </View>
         );

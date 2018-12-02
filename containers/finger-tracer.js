@@ -1,6 +1,14 @@
 import React from 'react';
 import { Svg } from 'expo';
-import { Dimensions } from 'react-native'
+import { Dimensions } from 'react-native';
+import { setSuggestions } from './suggestions';
+
+
+function insertAtEndOfSameLength(array, word) {
+    const index = array.findIndex(w => w.length > word.length);
+    array.splice(index < 0 ? array.length : index, 0, word);
+}
+
 
 const INIT_STATE = {
     unfinishedCandidates: [],
@@ -82,23 +90,41 @@ export default class FingerTracer extends React.Component {
     };
 
     updateCandidates = (newLetter) => {
+
         const { unfinishedCandidates, lastLetter } = this.state;
 
         if (lastLetter === newLetter) { return; }
         if (unfinishedCandidates.length === 0) {
-            this.setState({ unfinishedCandidates: [newLetter], lastLetter: newLetter });
+            this.setState({ unfinishedCandidates: [ newLetter, `${newLetter}${newLetter}` ], lastLetter: newLetter });
         } else {
-            const newUnfinishedCandidatees = unfinishedCandidates.slice();
+            const newUnfinishedCandidates = unfinishedCandidates.slice();
             const cands = [];
             unfinishedCandidates.forEach(unfinCandidate => {
                 const path = this.followDictionary(unfinCandidate);
                 if (path !== undefined && path[newLetter] !== undefined) {
-                    newUnfinishedCandidatees.push(`${unfinCandidate}${newLetter}`);
-                    if (path[newLetter][0]) { cands.push(path[newLetter][0]); }
+                    const isDoubleLegit = path[newLetter][newLetter] !== undefined;
+
+                    if (newUnfinishedCandidates.indexOf(`${unfinCandidate}${newLetter}`) < 0) {
+                        newUnfinishedCandidates.push(`${unfinCandidate}${newLetter}`);
+                        if (isDoubleLegit) { newUnfinishedCandidates.push(`${unfinCandidate}${newLetter}${newLetter}`); }
+                    }
+                    if (path[newLetter][0]) {
+                        insertAtEndOfSameLength(cands, path[newLetter][0]);
+                    }
+                    if (
+                        isDoubleLegit
+                        && path[newLetter][newLetter][0]
+                    ) {
+                        insertAtEndOfSameLength(cands, path[newLetter][newLetter][0]);
+                    }
                 }
             });
-            console.log('\n-------\n', cands);
-            this.setState({ unfinishedCandidates: newUnfinishedCandidatees, lastLetter: newLetter });
+            console.log(cands);
+            if (setSuggestions !== null) {
+                const suggestions = cands.length > 3 ? cands.slice(cands.length - 3) : cands;
+                setSuggestions(suggestions);
+            }
+            this.setState({ unfinishedCandidates: newUnfinishedCandidates, lastLetter: newLetter });
         }
 
     };
