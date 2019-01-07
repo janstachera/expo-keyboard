@@ -119,10 +119,17 @@ export default class FingerTracer extends React.Component {
                     }
                 }
             });
-            console.log(cands);
+            // console.log(cands);
             if (setSuggestions !== null) {
-                const suggestions = cands.length > 3 ? cands.slice(cands.length - 3) : cands;
-                setSuggestions(suggestions);
+                const reverseCands = cands.slice().reverse();
+
+                const suggestions = reverseCands.filter(s => s[s.length - 1] === newLetter);
+                if (suggestions.length < 3) {
+                    const otherSuggestions = reverseCands.slice(0,3).filter(c => !suggestions.some(s => s === c));
+                    suggestions.push(...otherSuggestions);
+                }
+
+                setSuggestions(suggestions.slice(0,3));
             }
             this.setState({ unfinishedCandidates: newUnfinishedCandidates, lastLetter: newLetter });
         }

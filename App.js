@@ -24,7 +24,7 @@ const arrToObj = (arr) =>
     }, {});
 
 const INIT_STATE = {
-    text: '',
+    text: 'asdgag',
     cursorPosition: 0,
     dictionary: fullDictionary.slice(),
     currentWord: '',
@@ -114,15 +114,17 @@ export default class App extends React.Component {
         return (
             <View style={viewStyle.container}>
                 <View style={viewStyle.preview}>
-                    <TextInput
-                        style={viewStyle.inputField}
-                        value={this.state.text}
-                        selectTextOnFocus={false}
-                        // onFocus={() => { Keyboard.dismiss(); }}
-                        onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }); }}
-                        ref={component => this._textInput = component}
-                        multiline
-                    />
+                    {/*<TextInput*/}
+                        {/*style={viewStyle.inputField}*/}
+                        {/*value={this.state.text}*/}
+                        {/*selectTextOnFocus={false}*/}
+                        {/*// onFocus={() => { Keyboard.dismiss(); }}*/}
+                        {/*readOnly*/}
+                        {/*onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }); }}*/}
+                        {/*ref={component => this._textInput = component}*/}
+                        {/*multiline*/}
+                    {/*/>*/}
+                    <Text>{this.state.text}</Text>
                 </View>
                 <FingerTracer
                     dictionary={fullDictionary}
