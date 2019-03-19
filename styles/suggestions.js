@@ -13,7 +13,7 @@ export const suggestionsStyle = StyleSheet.create({
         flex: 0.3,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#eee',
+        backgroundColor: '#fff',
     },
     suggButtonLabel: {
         color: '#555',

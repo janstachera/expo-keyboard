@@ -1,52 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
-import { keyboardStyle, suggestionsStyle, viewStyle } from '../styles';
+import { keyboardStyle } from '../styles';
 
 export default class Keyboard extends React.Component {
 
-    handleSpacePress = () => {
-        const {
-            cursorPosition,
-            setContainerState,
-            text,
-            updateCursorPosition,
-        } = this.props;
-
-        updateCursorPosition(cursorPosition + 1);
-
-        setContainerState({
-            currentWord: '',
-            text: text.substr(0, cursorPosition) + ' ' + text.substr(cursorPosition),
-            cursorPosition: cursorPosition + 1,
-        });
-    };
-
-    inputCharacter = (character) => {
-        const {
-            text,
-            cursorPosition,
-            currentWord,
-            setContainerState,
-            dictionary,
-            updateCursorPosition,
-        } = this.props;
-
-        const newCurrentWord = `${currentWord}${character}`;
-        const newCandWords = dictionary.filter((word) => word.indexOf(newCurrentWord) === 0);
-
-        updateCursorPosition(cursorPosition + 1);
-
-        setContainerState({
-            currentWord: newCurrentWord,
-            dictionary: newCandWords,
-            text: `${text.substr(0, cursorPosition)}${character}${text.substr(cursorPosition)}`,
-            cursorPosition: cursorPosition + 1,
-        });
-
-    };
-
     render() {
-
         const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
         const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
         const row3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
@@ -59,7 +17,7 @@ export default class Keyboard extends React.Component {
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 key={elem}
-                                onPress={() => this.inputCharacter(elem)}
+                                onPress={() => this.props.addCharacter(elem)}
                                 style={keyboardStyle.button}
                             >
                                 <Text style={keyboardStyle.buttonLabel}>
@@ -69,6 +27,7 @@ export default class Keyboard extends React.Component {
                     )
                 }
             </View>);
+
         return (
             <View
                 style={keyboardStyle.keyboardWrapper}
@@ -83,7 +42,7 @@ export default class Keyboard extends React.Component {
                         title=' '
                         key='space'
                         style={keyboardStyle.space}
-                        onPress={this.handleSpacePress}
+                        onPress={this.props.addSpace}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
                             {' '}
@@ -97,7 +56,7 @@ export default class Keyboard extends React.Component {
                         onLongPress={this.props.resetMainState}
                     >
                         <Text style={keyboardStyle.buttonLabel}>
-                            {'bksp'}
+                            {'DEL'}
                         </Text>
                     </TouchableOpacity>
                 </View>

@@ -3,6 +3,8 @@ import { Svg } from 'expo';
 import { Dimensions } from 'react-native';
 import { setSuggestions } from './suggestions';
 
+export let updateCandidates = null;
+export let resetCandidates = null;
 
 function insertAtEndOfSameLength(array, word) {
     const index = array.findIndex(w => w.length > word.length);
@@ -27,6 +29,11 @@ export default class FingerTracer extends React.Component {
         this.state = {...INIT_STATE};
     }
 
+    componentDidMount () {
+        updateCandidates = this.updateCandidates;
+        resetCandidates = this.handleFingerUp;
+    }
+
     createSvgStyle = () => ({
         height: Dimensions.get('window').height * 0.325,
         borderColor: 'red',
@@ -45,8 +52,7 @@ export default class FingerTracer extends React.Component {
     };
 
     handleFingerUp = () => {
-        wiperBreak = false;
-        this.setState({ ...INIT_STATE, visible: true, });
+
         const traceWiper = () => {
             if (!wiperBreak) {
                 let trace = this.state.fingerTrace.slice();
@@ -59,7 +65,10 @@ export default class FingerTracer extends React.Component {
                 }
             }
         };
-        traceWiper();
+
+        wiperBreak = false;
+        this.setState(({ fingerTrace }) => ({ ...INIT_STATE, fingerTrace, visible: true }), traceWiper);
+
     };
 
     handleMove = (e) => {
@@ -79,7 +88,7 @@ export default class FingerTracer extends React.Component {
         const xRatio = 100*pageX/width;
         const yRatio = 100*(pageY-topOfKbOffset)/(height - topOfKbOffset);
 
-        // console.log(this.resolveLetter(xRatio, yRatio));
+
         this.updateCandidates(this.resolveLetter(xRatio, yRatio));
 
         trace.push(coords);
@@ -119,7 +128,7 @@ export default class FingerTracer extends React.Component {
                     }
                 }
             });
-            // console.log(cands);
+
             if (setSuggestions !== null) {
                 const reverseCands = cands.slice().reverse();
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
-import { keyboardStyle, suggestionsStyle, viewStyle } from './styles';
+import { keyboardStyle, viewStyle } from './styles';
 import MyKeyboard from "./containers/keyboard";
-import FingerTracer from "./containers/finger-tracer";
-import { Suggestions } from "./containers/suggestions";
+import FingerTracer, { resetCandidates } from "./containers/finger-tracer";
+import { Suggestions, setSuggestions } from "./containers/suggestions";
 import { Keyboard } from 'react-native';
 import { dictionary } from './dictionary';
 
@@ -24,13 +24,11 @@ const arrToObj = (arr) =>
     }, {});
 
 const INIT_STATE = {
-    text: 'asdgag',
-    cursorPosition: 0,
+    text: '',
     dictionary: fullDictionary.slice(),
     currentWord: '',
     svgVisible: true,
 };
-const suggestions = [];
 
 export default class App extends React.Component {
 
@@ -53,50 +51,36 @@ export default class App extends React.Component {
         this.setState(INIT_STATE);
     };
 
+    addSpace = () => this.addCharacter(' ');
+
+    addCharacter = (char) => {
+        this.setState(({ text }) => ({ text: `${text}${char}` }));
+    };
+
     removeCharacter = () => {
         const {
             text,
-            cursorPosition,
         } = this.state;
 
-        const output = text.substr(0, cursorPosition - 1) + text.substr(cursorPosition);
+        const output = text.substr(0, text.length - 1);
 
         this.setState({
             text: output,
-            cursorPosition: cursorPosition - 1,
             currentWord: '',
-            dictionary: fullDictionary.slice(),
-        });
-    };
-
-    updateCursorPosition = (position) => {
-        this._textInput.setNativeProps({
-            selection: {
-                end: position,
-                start: position ,
-            },
-        });
+        }, () => setSuggestions([]));
     };
 
     chooseSuggestion = (word) => {
-        const {
-            currentWord,
-            cursorPosition,
-            text,
-        } = this.state;
+        const { text } = this.state;
 
-        const partOfWordToAdd = word.substr(currentWord.length);
-
-        const newText = text.substr(0, cursorPosition) + partOfWordToAdd + ' ' + text.substr(cursorPosition);
-        const position = cursorPosition + partOfWordToAdd.length + 1;
-
-        this.updateCursorPosition(position);
+        const newText = `${text}${word} `;
 
         this.setState({
-            dictionary: fullDictionary.slice(),
             text: newText,
-            cursorPosition: position,
             currentWord: '',
+        }, () => {
+            setSuggestions([]);
+            resetCandidates();
         });
     };
 
@@ -110,21 +94,11 @@ export default class App extends React.Component {
 
     render() {
         if (dictionary && fullDictionary.length === 0) { this.prepareDictionary(); }
-        const suggestions = this.state.currentWord ? this.state.dictionary.slice(0,3) : [];
+
         return (
             <View style={viewStyle.container}>
                 <View style={viewStyle.preview}>
-                    {/*<TextInput*/}
-                        {/*style={viewStyle.inputField}*/}
-                        {/*value={this.state.text}*/}
-                        {/*selectTextOnFocus={false}*/}
-                        {/*// onFocus={() => { Keyboard.dismiss(); }}*/}
-                        {/*readOnly*/}
-                        {/*onSelectionChange={(event) => { this.setState({ cursorPosition: event.nativeEvent.selection.start }); }}*/}
-                        {/*ref={component => this._textInput = component}*/}
-                        {/*multiline*/}
-                    {/*/>*/}
-                    <Text>{this.state.text}</Text>
+                    <Text ref={component => this._textInput = component}>{`${this.state.text}|`}</Text>
                 </View>
                 <FingerTracer
                     dictionary={fullDictionary}
@@ -143,15 +117,15 @@ export default class App extends React.Component {
                         onChooseSuggestion={this.chooseSuggestion}
                     />
                     <MyKeyboard
+                        addCharacter={this.addCharacter}
+                        addSpace={this.addSpace}
                         removeCharacter={this.removeCharacter}
                         setContainerState={this.handleKeyboardSetState}
                         text={this.state.text}
-                        cursorPosition={this.state.cursorPosition}
                         dictionary={this.state.dictionary}
                         currentWord={this.state.currentWord}
                         textInput={this._textInput}
                         resetMainState={this.resetMainState}
-                        updateCursorPosition={this.updateCursorPosition}
                     />
                 </View>
             </View>

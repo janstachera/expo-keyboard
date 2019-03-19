@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const keyboardStyle = StyleSheet.create({
     keyboard: {
         flex: 0.4,
-        backgroundColor: 'green',
+        backgroundColor: 'rgba(0, 0, 0, 0.2)',
         justifyContent: 'space-between',
     },
     keyboardWrapper: {
