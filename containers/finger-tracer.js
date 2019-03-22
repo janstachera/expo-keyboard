@@ -52,6 +52,10 @@ export default class FingerTracer extends React.Component {
     };
 
     handleFingerUp = () => {
+        const { unfinishedCandidates } = this.state;
+        if ((unfinishedCandidates.length === 2) && (unfinishedCandidates[1] === `${unfinishedCandidates[0]}${unfinishedCandidates[0]}`)) {
+            this.props.addCharacter(unfinishedCandidates[0]);
+        }
 
         const traceWiper = () => {
             if (!wiperBreak) {

@@ -101,9 +101,13 @@ export default class App extends React.Component {
                     <Text ref={component => this._textInput = component}>{`${this.state.text}|`}</Text>
                 </View>
                 <FingerTracer
+                    addCharacter={this.addCharacter}
                     dictionary={fullDictionary}
                     visible={this.state.svgVisible}
                     ref={(fingerTracer) => this.fingerTracer = fingerTracer}
+                />
+                <Suggestions
+                    onChooseSuggestion={this.chooseSuggestion}
                 />
                 <View
                     style={keyboardStyle.keyboard}
@@ -113,9 +117,6 @@ export default class App extends React.Component {
                     onResponderMove={(e) => { this.fingerTracer.handleMove(e); }}
                     onResponderRelease={() => { this.fingerTracer.handleFingerUp(); }}
                 >
-                    <Suggestions
-                        onChooseSuggestion={this.chooseSuggestion}
-                    />
                     <MyKeyboard
                         addCharacter={this.addCharacter}
                         addSpace={this.addSpace}
