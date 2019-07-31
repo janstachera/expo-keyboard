@@ -38,9 +38,7 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        setTimeout(() => this.setState({
-            dictionary: fullDictionary
-        }), 1000);
+        if (dictionary && fullDictionary.length === 0) { this.prepareDictionary(); }
     }
 
     handleKeyboardSetState = (args) => {
@@ -90,10 +88,14 @@ export default class App extends React.Component {
             .map(dict => dict.default)
             .reduce((acc,dict) => acc.concat(dict), [])
         );
+
+        this.setState({
+            dictionary: fullDictionary,
+        });
+
     };
 
     render() {
-        if (dictionary && fullDictionary.length === 0) { this.prepareDictionary(); }
 
         return (
             <View style={viewStyle.container}>
