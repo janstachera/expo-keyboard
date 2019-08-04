@@ -1,14 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
+import { Text, View, TextInput  } from 'react-native';
 import { keyboardStyle, viewStyle } from './styles';
 import MyKeyboard from "./containers/keyboard";
 import FingerTracer, { resetCandidates } from "./containers/finger-tracer";
 import { Suggestions, setSuggestions } from "./containers/suggestions";
-import { Keyboard } from 'react-native';
 import { dictionary } from './dictionary';
 
-let fullDictionary = [];
-
+let fullDictionary = {};
 
 const arrToObj = (arr) =>
     arr.reduce((acc, word) => {
@@ -25,7 +23,6 @@ const arrToObj = (arr) =>
 
 const INIT_STATE = {
     text: '',
-    dictionary: fullDictionary.slice(),
     currentWord: '',
     svgVisible: true,
 };
@@ -38,7 +35,9 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        if (dictionary && fullDictionary.length === 0) { this.prepareDictionary(); }
+        if (dictionary && Object.keys(fullDictionary).length === 0) {
+            this.prepareDictionary();
+        }
     }
 
     handleKeyboardSetState = (args) => {
@@ -89,9 +88,7 @@ export default class App extends React.Component {
             .reduce((acc,dict) => acc.concat(dict), [])
         );
 
-        this.setState({
-            dictionary: fullDictionary,
-        });
+        this.forceUpdate();
 
     };
 
@@ -125,7 +122,6 @@ export default class App extends React.Component {
                         removeCharacter={this.removeCharacter}
                         setContainerState={this.handleKeyboardSetState}
                         text={this.state.text}
-                        dictionary={this.state.dictionary}
                         currentWord={this.state.currentWord}
                         textInput={this._textInput}
                         resetMainState={this.resetMainState}
