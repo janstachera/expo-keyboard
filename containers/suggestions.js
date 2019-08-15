@@ -34,9 +34,18 @@ export class Suggestions extends React.Component {
 
         return (
             <View style={suggestionsStyle.suggestions}>
-                { suggestions.length > 2 ? this.createSuggButton(suggestions[2], 2) : null }
-                { suggestions.length > 0 ? this.createSuggButton(suggestions[0], 0) : null }
-                { suggestions.length > 1 ? this.createSuggButton(suggestions[1], 1) : null }
+                { suggestions.length > 2
+                    ? this.createSuggButton(suggestions[2], 2)
+                    : null
+                }
+                { suggestions.length > 0
+                    ? this.createSuggButton(suggestions[0], 0)
+                    : null
+                }
+                { suggestions.length > 1
+                    ? this.createSuggButton(suggestions[1], 1)
+                    : null
+                }
             </View>
         );
     }

@@ -2,39 +2,41 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import { keyboardStyle } from '../styles';
 
+
+const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
+const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
+const row3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
+const allRows = [row1, row2, row3];
+
 export default class Keyboard extends React.Component {
 
-    render() {
-        const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
-        const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
-        const row3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
-        const allRows = [row1, row2, row3];
-        const addKeyboardRow = (row, index) =>
-            (<View style={keyboardStyle.keyboardRow} key={`row${index}`}>
-                {
-                    row.map(
-                        elem =>
-                            <TouchableOpacity
-                                activeOpacity={0.5}
-                                key={elem}
-                                onPress={() => this.props.addCharacter(elem)}
-                                style={keyboardStyle.button}
-                            >
-                                <Text style={keyboardStyle.buttonLabel}>
-                                    {elem.toUpperCase()}
-                                </Text>
-                            </TouchableOpacity>
-                    )
-                }
-            </View>);
+    addKeyboardRow = (row, index) =>
+        (<View style={keyboardStyle.keyboardRow} key={`row${index}`}>
+            {
+                row.map(
+                    elem =>
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            key={elem}
+                            onPress={() => this.props.addCharacter(elem)}
+                            style={keyboardStyle.button}
+                        >
+                            <Text style={keyboardStyle.buttonLabel}>
+                                {elem.toUpperCase()}
+                            </Text>
+                        </TouchableOpacity>
+                )
+            }
+        </View>);
 
+    render() {
         return (
             <View
                 style={keyboardStyle.keyboardWrapper}
             >
                 {
                     allRows.map(
-                        (row, index) => addKeyboardRow(row, index)
+                        (row, index) => this.addKeyboardRow(row, index)
                     )
                 }
                 <View style={keyboardStyle.keyboardRow}>

@@ -3,7 +3,6 @@ import { Svg } from 'expo';
 import { Dimensions } from 'react-native';
 import { setSuggestions } from './suggestions';
 
-export let updateCandidates = null;
 export let resetCandidates = null;
 
 function insertAtEndOfSameLength(array, word) {
@@ -30,7 +29,6 @@ export default class FingerTracer extends React.Component {
     }
 
     componentDidMount () {
-        updateCandidates = this.updateCandidates;
         resetCandidates = this.handleFingerUp;
     }
 
