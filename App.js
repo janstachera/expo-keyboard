@@ -23,7 +23,6 @@ const arrToObj = (arr) =>
 
 const INIT_STATE = {
     text: '',
-    currentWord: '',
     svgVisible: true,
 };
 
@@ -39,10 +38,6 @@ export default class App extends React.Component {
             this.prepareDictionary();
         }
     }
-
-    handleKeyboardSetState = (args) => {
-        this.setState({ ...args });
-    };
 
     resetMainState = () => {
         this.setState(INIT_STATE);
@@ -63,7 +58,6 @@ export default class App extends React.Component {
 
         this.setState({
             text: output,
-            currentWord: '',
         }, () => setSuggestions([]));
     };
 
@@ -74,7 +68,6 @@ export default class App extends React.Component {
 
         this.setState({
             text: newText,
-            currentWord: '',
         }, () => {
             setSuggestions([]);
             resetCandidates();
@@ -97,7 +90,7 @@ export default class App extends React.Component {
         return (
             <View style={viewStyle.container}>
                 <View style={viewStyle.preview}>
-                    <Text ref={component => this._textInput = component}>{`${this.state.text}|`}</Text>
+                    <Text>{`${this.state.text}|`}</Text>
                 </View>
                 <FingerTracer
                     addCharacter={this.addCharacter}
@@ -120,10 +113,7 @@ export default class App extends React.Component {
                         addCharacter={this.addCharacter}
                         addSpace={this.addSpace}
                         removeCharacter={this.removeCharacter}
-                        setContainerState={this.handleKeyboardSetState}
                         text={this.state.text}
-                        currentWord={this.state.currentWord}
-                        textInput={this._textInput}
                         resetMainState={this.resetMainState}
                     />
                 </View>

@@ -5,11 +5,10 @@ import { setSuggestions } from './suggestions';
 
 export let resetCandidates = null;
 
-function insertAtEndOfSameLength(array, word) {
+const  insertAtEndOfSameLength = (array, word) => {
     const index = array.findIndex(w => w.length > word.length);
     array.splice(index < 0 ? array.length : index, 0, word);
-}
-
+};
 
 const INIT_STATE = {
     unfinishedCandidates: [],
@@ -19,9 +18,9 @@ const INIT_STATE = {
     visible: false,
 };
 
-let wiperBreak = false;
-
 export default class FingerTracer extends React.Component {
+
+    wiperBreak = false;
 
     constructor(props) {
         super(props);
@@ -44,7 +43,7 @@ export default class FingerTracer extends React.Component {
     });
 
     handleFingerDown = () => {
-        wiperBreak = true;
+        this.wiperBreak = true;
         this.setState({ ...INIT_STATE, visible: true, });
         this.updateTrace(INIT_STATE.fingerTrace);
     };
@@ -56,7 +55,7 @@ export default class FingerTracer extends React.Component {
         }
 
         const traceWiper = () => {
-            if (!wiperBreak) {
+            if (!this.wiperBreak) {
                 let trace = this.state.fingerTrace.slice();
                 trace.splice(0, 4);
                 this.updateTrace(trace);
@@ -68,7 +67,7 @@ export default class FingerTracer extends React.Component {
             }
         };
 
-        wiperBreak = false;
+        this.wiperBreak = false;
         this.setState(({ fingerTrace }) => ({ ...INIT_STATE, fingerTrace, visible: true }), traceWiper);
 
     };
@@ -98,6 +97,45 @@ export default class FingerTracer extends React.Component {
             trace.splice(0, 1);
         }
         this.updateTrace(trace);
+    };
+
+    followDictionary = (path) => {
+        const letters = [...path];
+        const { dictionary } = this.props;
+        let pointer = dictionary;
+        letters.forEach(letter => pointer = pointer[letter]);
+        return pointer;
+    };
+
+    resolveLetter = (xRatio, yRatio) => {
+
+        const rowDividers = [10, 11.112, 14.286];
+        const letters = [
+            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+        ];
+
+        switch (true) {
+            case (yRatio < 25):
+                return letters[0][Math.floor(xRatio/rowDividers[0])];
+            case (yRatio < 50):
+                return letters[1][Math.floor(xRatio/rowDividers[1])];
+            case (yRatio < 75):
+                return letters[2][Math.floor(xRatio/rowDividers[2])];
+            default:
+                return '';
+        }
+    };
+
+    updateTrace = (trace) => {
+        let points = 'M' + trace.reduce(
+            (ac, el, ind) => ind % 2 === 0
+                ? ac + el
+                : ac + 'L' + el,
+            ''
+        );
+        this.setState({ fingerTrace: trace, fingerString: points });
     };
 
     updateCandidates = (newLetter) => {
@@ -147,45 +185,6 @@ export default class FingerTracer extends React.Component {
 
     };
 
-    followDictionary = (path) => {
-        const letters = [...path];
-        const { dictionary } = this.props;
-        let pointer = dictionary;
-        letters.forEach(letter => pointer = pointer[letter]);
-        return pointer;
-    };
-
-    resolveLetter = (xRatio, yRatio) => {
-
-        const rowDividers = [10, 11.112, 14.286];
-        const letters = [
-            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-        ];
-
-        switch (true) {
-            case (yRatio < 25):
-                return letters[0][Math.floor(xRatio/rowDividers[0])];
-            case (yRatio < 50):
-                return letters[1][Math.floor(xRatio/rowDividers[1])];
-            case (yRatio < 75):
-                return letters[2][Math.floor(xRatio/rowDividers[2])];
-            default:
-                return '';
-        }
-    };
-
-    updateTrace = (trace) => {
-        let points = 'M' + trace.reduce(
-            (ac, el, ind) => ind % 2 === 0
-                ? ac + el
-                : ac + 'L' + el,
-            ''
-        );
-        this.setState({ fingerTrace: trace, fingerString: points });
-    };
-
     render () {
         return (
             <Svg
@@ -194,9 +193,7 @@ export default class FingerTracer extends React.Component {
                     () => true
                 }
                 onMoveShouldSetResponder={
-                    () => {
-                        return true;
-                    }
+                    () => true
                 }
                 onResponderGrant={
                     () => {
